@@ -1,0 +1,124 @@
+﻿
+> ems@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+node.exe : ΓÜá The 
+"middleware" file 
+convention is 
+deprecated. Please 
+use "proxy" instead. 
+Learn more: https://n
+extjs.org/docs/messag
+es/middleware-to-prox
+y
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (ΓÜá The   
+  "middle...lewar    
+e-to-proxy:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  Creating an optimized production build ...
+Found 1 warning 
+while optimizing 
+generated CSS:
+
+[2mΓöé     
+animation-delay: 
+0.3s;[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   
+@import url('https://
+fonts.googleapis.com/
+css2?family=Inter:wgh
+t@300;400;500;600;700
+;800&display=swap');
+[2mΓöå[22m         
+ [33m[2m^--[22m 
+Unknown at rule: 
+@import[39m
+[2mΓöå[22m
+[2mΓöé   body {[22m
+[2mΓöé     
+font-family: 
+'Inter', 
+-apple-system, 
+BlinkMacSystemFont, 
+'Segoe UI', Roboto, 
+sans-serif;[22m
+
+
+> Build error 
+occurred
+Error: Turbopack 
+build failed with 1 
+errors:
+./src/app/(auth)/rese
+t-password/[token]/pa
+ge.tsx:249:20
+Parsing ecmascript 
+source code failed
+[0m [90m 247 
+|[39m               
+[33m<[39m[33m/[39
+m[33mform[39m[33m>
+[39m
+ [90m 248 |[39m
+[31m[1m>[22m[39m
+[90m 249 |[39m      
+         [33m<[39m
+[33mdiv[39m classNam
+e[33m=[39m[32m"tex
+t-center 
+mt-6"[39m[33m>[39m
+ [90m     |[39m    
+                [31m
+[1m^[22m[39m[31m
+[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^
+[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[2
+2m[39m
+ [90m 250 |[39m    
+             [33m<[
+39m[33mLink[39m
+ [90m 251 |[39m    
+               href[
+33m=[39m[32m"/login
+"[39m
+ [90m 252 |[39m    
+               classN
+ame[33m=[39m[32m"t
+ext-sm text-primary h
+over:text-primary/80 
+transition-colors"[3
+9m[0m
+
+Expected '</', got 
+'className'
+
+
+    at <unknown> (./s
+rc/app/(auth)/reset-p
+assword/[token]/page.
+tsx:249:20)

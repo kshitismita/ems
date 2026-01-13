@@ -1,0 +1,105 @@
+﻿
+> ems@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+node.exe : ΓÜá The 
+"middleware" file 
+convention is deprecated. 
+Please use "proxy" 
+instead. Learn more: https
+://nextjs.org/docs/message
+s/middleware-to-proxy
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (Γ  
+  Üá The "middle...lewa   
+ re-to-proxy:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+  Creating an optimized production build ...
+Found 1 warning while 
+optimizing generated CSS:
+
+[2mΓöé     
+animation-delay: 
+0.3s;[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @import url
+('https://fonts.googleapis
+.com/css2?family=Inter:wgh
+t@300;400;500;600;700;800&
+display=swap');
+[2mΓöå[22m          
+[33m[2m^--[22m Unknown 
+at rule: @import[39m
+[2mΓöå[22m
+[2mΓöé   body {[22m
+[2mΓöé     font-family: 
+'Inter', -apple-system, 
+BlinkMacSystemFont, 
+'Segoe UI', Roboto, 
+sans-serif;[22m
+
+Γ£ô Compiled successfully in 6.2s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(dashboard)/admi
+n/leave/page.tsx:649:44
+Type error: Cannot find 
+name 'openRejectModal'. 
+Did you mean 
+'showRejectModal'?
+
+[0m [90m 647 |[39m     
+                    
+[33m<[39m[33m>[39m
+ [90m 648 |[39m         
+                  [33m<[
+39m[33mbutton[39m
+[31m[1m>[22m[39m[90m 
+649 |[39m                
+             
+onClick[33m=[39m{() 
+[33m=>[39m openRejectMod
+al(selectedRequest)}
+ [90m     |[39m         
+                          
+         
+[31m[1m^[22m[39m
+ [90m 650 |[39m         
+                    disabl
+ed[33m=[39m{[33m![39m
+[33m![39mprocessing}
+ [90m 651 |[39m         
+                    classN
+ame[33m=[39m[32m"flex-1
+ py-3 px-4 bg-rose-500/10 
+hover:bg-rose-500/20 
+text-rose-400 border 
+border-rose-500/20 
+rounded-xl font-bold 
+transition-all flex 
+items-center 
+justify-center gap-2 
+text-sm 
+disabled:opacity-50"[39m
+ [90m 652 |[39m         
+                  
+[33m>[39m[0m
+Next.js build worker 
+exited with code: 1 and 
+signal: null

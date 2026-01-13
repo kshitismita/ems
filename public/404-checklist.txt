@@ -1,0 +1,16 @@
+# Favicon
+/favicon.ico
+/favicon.png
+/favicon.svg
+
+# Common Next.js files
+/robots.txt
+/sitemap.xml
+
+# API routes that might be missing
+/api/health
+/api/auth/validate
+
+# Static assets
+/uploads/*
+/logo.png
