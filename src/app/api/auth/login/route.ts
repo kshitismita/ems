@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import LoginHistory from '@/models/LoginHistory';
-import { generateToken, createAuthUser } from '@/lib/auth';
+import { generateTokenPair, createAuthUser, generateToken } from '@/lib/auth';
 
 // Helper function to get client IP address
 function getClientIP(req: NextRequest): string {
@@ -118,24 +118,47 @@ export async function POST(req: NextRequest) {
       user._id.toString()
     );
 
-    // Generate token
+    // Generate token pair
     const authUser = createAuthUser(user);
-    const token = generateToken(authUser);
+    const tokenPair = await generateTokenPair(authUser, userAgent, ipAddress);
+    
+    // Also generate legacy token for backward compatibility
+    const legacyToken = generateToken(authUser);
 
     // Create response
     const response = NextResponse.json({
       message: 'Login successful',
       user: authUser,
-      token, // Still return token for potential legacy use during transition
+      token: legacyToken, // Legacy token for backward compatibility
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
+      sessionId: tokenPair.sessionId,
+      expiresAt: tokenPair.expiresAt
     });
 
-    // Set cookie
-    response.cookies.set('auth_token', token, {
+    // Set cookies
+    response.cookies.set('auth_token', tokenPair.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 15 * 60, // 15 minutes
+    });
+    
+    response.cookies.set('refresh_token', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+    
+    response.cookies.set('session_id', tokenPair.sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
     return response;

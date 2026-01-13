@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, updateSessionActivity } from '@/lib/auth';
+import Session from '@/models/Session';
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: any;
@@ -34,6 +35,29 @@ export function withAuth(
 
       const user = verifyToken(token);
 
+      // Check if session is still valid
+      if (user.sessionId) {
+        const session = await Session.findOne({
+          sessionId: user.sessionId,
+          revoked: false,
+          expiresAt: { $gt: new Date() }
+        });
+
+        if (!session) {
+          return NextResponse.json(
+            { 
+              error: 'Session expired',
+              code: 'SESSION_EXPIRED',
+              requiresRefresh: true 
+            },
+            { status: 401 }
+          );
+        }
+
+        // Update session activity
+        await updateSessionActivity(user.sessionId);
+      }
+
       console.log(`[AUTH_MIDDLEWARE] Request: ${req.method} ${req.nextUrl.pathname}`);
       console.log(`[AUTH_MIDDLEWARE] User: ${user.name} (${user.id}), Role: ${user.role}, Required: ${requiredRole || 'None'}`);
 
@@ -58,6 +82,19 @@ export function withAuth(
         stack: error.stack,
         url: req.nextUrl.pathname
       });
+
+      // Handle token expiry specifically
+      if (error.message === 'TOKEN_EXPIRED') {
+        return NextResponse.json(
+          { 
+            error: 'Token expired',
+            code: 'TOKEN_EXPIRED',
+            requiresRefresh: true 
+          },
+          { status: 401 }
+        );
+      }
+
       return NextResponse.json(
         { error: 'Invalid token', details: error.message },
         { status: 401 }
