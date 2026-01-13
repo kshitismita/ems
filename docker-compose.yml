@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  ems-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/ems
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+    depends_on:
+      - mongo
+    networks:
+      - ems-network
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=ems
+    networks:
+      - ems-network
+
+volumes:
+  mongo-data:
+
+networks:
+  ems-network:
+    driver: bridge
