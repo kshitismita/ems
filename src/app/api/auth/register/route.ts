@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { generateToken, createAuthUser } from '@/lib/auth';
 
+export const runtime = 'nodejs';
+
 export async function POST(req: NextRequest) {
   console.log('🔥 Registration endpoint called');
 

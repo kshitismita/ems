@@ -3,6 +3,8 @@ import { withAuth } from '@/middleware/auth';
 import Session from '@/models/Session';
 import { cleanupExpiredSessions } from '@/lib/auth';
 
+export const runtime = 'nodejs';
+
 // Get active sessions for the current user
 export const GET = withAuth(async (req: NextRequest, user: any) => {
   try {

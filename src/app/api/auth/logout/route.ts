@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revokeSession, revokeAllUserSessions } from '@/lib/auth';
 import { verifyToken } from '@/lib/auth';
 
+export const runtime = 'nodejs';
+
 export async function POST(req: NextRequest) {
   try {
     const { sessionId, logoutAll = false } = await req.json();

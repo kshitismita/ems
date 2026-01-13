@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { refreshAccessToken } from '@/lib/auth';
 
+export const runtime = 'nodejs';
+
 // Helper function to get client IP address
 function getClientIP(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for');
