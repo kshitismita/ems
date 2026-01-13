@@ -925,27 +925,56 @@ export default function ProjectDetailsPage({
                                                 </h2>
                                                 <p className="text-gray-400 max-w-2xl">{project?.description}</p>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className={cn(
-                                                    "inline-flex px-3 py-1 rounded-full text-sm font-medium border",
-                                                    project?.status === 'active' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                        project?.status === 'planning' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                            project?.status === 'completed' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
-                                                                project?.status === 'on-hold' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
-                                                                    'bg-red-500/10 text-red-400 border-red-500/20'
-                                                )}>
-                                                    {project?.status}
-                                                </span>
-                                                <span className={cn(
-                                                    "inline-flex px-3 py-1 rounded-full text-sm font-medium border ml-2",
-                                                    project?.priority === 'critical' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                        project?.priority === 'high' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
-                                                            project?.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
-                                                                'bg-green-500/10 text-green-400 border-green-500/20'
-                                                )}>
-                                                    {project?.priority}
-                                                </span>
-                                            </div>
+                                            {isEditing ? (
+                                                <div className="flex items-center gap-4">
+                                                    {/* Status Edit */}
+                                                    <select
+                                                        value={editForm.status}
+                                                        onChange={(e) => setEditForm({ ...editForm, status: e.target.value as 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled' })}
+                                                        className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    >
+                                                        <option value="planning" className="bg-zinc-900 text-white">Planning</option>
+                                                        <option value="active" className="bg-zinc-900 text-white">Active</option>
+                                                        <option value="on-hold" className="bg-zinc-900 text-white">On Hold</option>
+                                                        <option value="completed" className="bg-zinc-900 text-white">Completed</option>
+                                                        <option value="cancelled" className="bg-zinc-900 text-white">Cancelled</option>
+                                                    </select>
+
+                                                    {/* Priority Edit */}
+                                                    <select
+                                                        value={editForm.priority}
+                                                        onChange={(e) => setEditForm({ ...editForm, priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' })}
+                                                        className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    >
+                                                        <option value="low" className="bg-zinc-900 text-white">Low</option>
+                                                        <option value="medium" className="bg-zinc-900 text-white">Medium</option>
+                                                        <option value="high" className="bg-zinc-900 text-white">High</option>
+                                                        <option value="critical" className="bg-zinc-900 text-white">Critical</option>
+                                                    </select>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn(
+                                                        "inline-flex px-3 py-1 rounded-full text-sm font-medium border",
+                                                        project?.status === 'active' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                            project?.status === 'planning' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                                                project?.status === 'completed' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
+                                                                    project?.status === 'on-hold' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                                                                        'bg-red-500/10 text-red-400 border-red-500/20'
+                                                    )}>
+                                                        {project?.status}
+                                                    </span>
+                                                    <span className={cn(
+                                                        "inline-flex px-3 py-1 rounded-full text-sm font-medium border ml-2",
+                                                        project?.priority === 'critical' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                                            project?.priority === 'high' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                                                                project?.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                                                                    'bg-green-500/10 text-green-400 border-green-500/20'
+                                                    )}>
+                                                        {project?.priority}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Project Details Grid */}
@@ -963,15 +992,33 @@ export default function ProjectDetailsPage({
                                                     </div>
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-xs text-gray-500">End Date</span>
-                                                        <span className="text-sm text-white font-medium">
-                                                            {project?.endDate ? new Date(project.endDate).toLocaleDateString() : 'Not set'}
-                                                        </span>
+                                                        <div className="text-sm text-white font-medium">
+                                                            {isEditing ? (
+                                                                <input
+                                                                    type="date"
+                                                                    value={editForm.endDate ? new Date(editForm.endDate).toISOString().split('T')[0] : ''}
+                                                                    onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                                                                    className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                                                />
+                                                            ) : (
+                                                                project?.endDate ? new Date(project.endDate).toLocaleDateString() : 'Not set'
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-xs text-gray-500">Deadline</span>
-                                                        <span className="text-sm text-white font-medium">
-                                                            {project?.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not set'}
-                                                        </span>
+                                                        <div className="text-sm text-white font-medium">
+                                                            {isEditing ? (
+                                                                <input
+                                                                    type="date"
+                                                                    value={editForm.deadline ? new Date(editForm.deadline).toISOString().split('T')[0] : ''}
+                                                                    onChange={(e) => setEditForm({ ...editForm, deadline: e.target.value })}
+                                                                    className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                                                />
+                                                            ) : (
+                                                                project?.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not set'
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -981,15 +1028,40 @@ export default function ProjectDetailsPage({
                                                 <h3 className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wider">Progress</h3>
                                                 <div className="space-y-3">
                                                     <div className="flex justify-between items-center mb-2">
-                                                        <span className="text-sm text-white font-medium">{project?.progress}%</span>
+                                                        <span className="text-sm text-white font-medium">
+                                                            {isEditing ? editForm.progress : project?.progress}%
+                                                        </span>
                                                         <span className="text-xs text-gray-500">Complete</span>
                                                     </div>
-                                                    <div className="w-full bg-white/10 rounded-full h-3">
-                                                        <div
-                                                            className="bg-gradient-to-r from-primary to-primary/80 h-3 rounded-full transition-all duration-500"
-                                                            style={{ width: `${project?.progress}%` }}
-                                                        ></div>
-                                                    </div>
+                                                    {isEditing ? (
+                                                        <div className="space-y-2">
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={editForm.progress || 0}
+                                                                onChange={(e) => setEditForm({ ...editForm, progress: parseInt(e.target.value) || 0 })}
+                                                                className="w-full"
+                                                            />
+                                                            <div className="flex justify-end">
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    value={editForm.progress || 0}
+                                                                    onChange={(e) => setEditForm({ ...editForm, progress: parseInt(e.target.value) || 0 })}
+                                                                    className="w-16 px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-white text-xs text-right focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-full bg-white/10 rounded-full h-3">
+                                                            <div
+                                                                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-3 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                                                                style={{ width: `${project?.progress || 0}%` }}
+                                                            ></div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -1636,4 +1708,3 @@ export default function ProjectDetailsPage({
         </DashboardLayout>
     );
 }
-

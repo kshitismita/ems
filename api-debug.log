@@ -874,3 +874,5 @@ Stack: Error: Request Timeout
 [2026-01-13T05:55:44.356Z] GET Reports - Query: {} | Sort: {"date":-1} | Found: 10 | User: Siddhesh (admin)
 [2026-01-13T05:55:44.739Z] GET Reports - Query: {} | Sort: {"date":-1} | Found: 10 | User: Siddhesh (admin)
 [2026-01-13T05:55:44.840Z] GET Reports - Query: {} | Sort: {"date":-1} | Found: 10 | User: Siddhesh (admin)
+[2026-01-13T07:14:09.942Z] GET Reports - Query: {"employee":"69653f392a2a86173130471f","feedback":{"$exists":true,"$ne":""}} | Sort: {"date":-1} | Found: 1 | User: Kshitismita Panda (employee)
+[2026-01-13T07:14:10.175Z] GET Reports - Query: {"employee":"69653f392a2a86173130471f","feedback":{"$exists":true,"$ne":""}} | Sort: {"date":-1} | Found: 1 | User: Kshitismita Panda (employee)

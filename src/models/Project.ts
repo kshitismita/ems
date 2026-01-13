@@ -14,7 +14,12 @@ export interface IProject extends Document {
     progress: number;
     tags?: string[];
     attachments?: string[];
-    referenceUrls?: string[];
+    referenceUrls?: Array<{
+        title: string;
+        url: string;
+        addedBy: mongoose.Types.ObjectId;
+        addedAt: Date;
+    }>;
     workflow?: {
         currentStage: string;
         stages: Array<{
@@ -114,8 +119,10 @@ const projectSchema = new Schema<IProject>({
         type: String,
     }],
     referenceUrls: [{
-        type: String,
-        trim: true,
+        title: { type: String, required: true, trim: true },
+        url: { type: String, required: true, trim: true },
+        addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        addedAt: { type: Date, default: Date.now },
     }],
     workflow: {
         currentStage: {

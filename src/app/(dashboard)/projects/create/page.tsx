@@ -41,6 +41,7 @@ export default function CreateProjectPage() {
   const [selectedEmployees, setSelectedEmployees] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
@@ -90,20 +91,40 @@ export default function CreateProjectPage() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (dropdownRef.current && !dropdownRef.current.contains(target) && triggerRef.current && !triggerRef.current.contains(target)) {
+      if (portalRef.current && !portalRef.current.contains(target) && triggerRef.current && !triggerRef.current.contains(target)) {
         setIsDropdownOpen(false);
       }
     };
+
+    // Throttled scroll/resize handler
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScrollAndResize = () => {
+      if (isDropdownOpen) {
+        // Clear previous timeout
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+
+        // Set new timeout to update position after scroll stops
+        scrollTimeout = setTimeout(() => {
+          updateDropdownPosition();
+        }, 50); // 50ms delay for performance
+      }
+    };
+
     if (isDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('resize', handleScrollAndResize, { passive: true });
     }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', handleScrollAndResize);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
     };
   }, [isDropdownOpen]);
 
   const fetchUsers = async (token: string) => {
     try {
+      console.log('🔍 Fetching users with token...');
       const [adminsResponse, employeesResponse] = await Promise.all([
         fetch('/api/employees?role=admin', {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -116,14 +137,20 @@ export default function CreateProjectPage() {
       if (adminsResponse.ok) {
         const adminsData = await adminsResponse.json();
         setAdmins(adminsData.employees || []);
+        console.log('✅ Admins fetched:', adminsData.employees?.length || 0);
+      } else {
+        console.error('❌ Failed to fetch admins:', adminsResponse.status);
       }
 
       if (employeesResponse.ok) {
         const employeesData = await employeesResponse.json();
         setEmployees(employeesData.employees || []);
+        console.log('✅ Employees fetched:', employeesData.employees?.length || 0);
+      } else {
+        console.error('❌ Failed to fetch employees:', employeesResponse.status);
       }
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('❌ Failed to fetch users:', error);
     }
   };
 
@@ -147,19 +174,40 @@ export default function CreateProjectPage() {
   const updateDropdownPosition = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 320; // Estimated max height with padding
+
+      // Check if dropdown would go below viewport
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      let topPosition;
+      if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+        // Position above if not enough space below
+        topPosition = rect.top + scrollY - dropdownHeight - 8;
+      } else {
+        // Position below (default)
+        topPosition = rect.bottom + scrollY + 8;
+      }
+
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8,
-        left: rect.left + window.scrollX,
+        top: topPosition,
+        left: rect.left + scrollX,
         width: rect.width
       });
     }
   };
 
   const handleDropdownToggle = () => {
+    console.log('🔍 Dropdown toggle clicked, current state:', isDropdownOpen);
+    console.log('🔍 Employees available:', employees.length);
     if (!isDropdownOpen) {
       updateDropdownPosition();
     }
     setIsDropdownOpen(!isDropdownOpen);
+    console.log('🔍 Dropdown state changed to:', !isDropdownOpen);
   };
 
   const filteredEmployees = employees.filter(employee =>
@@ -418,7 +466,7 @@ export default function CreateProjectPage() {
                     Team Assignment
                   </h3>
 
-                  {/* Multi-Select Dropdown */}
+                  {/* Simple Dropdown Container */}
                   <div ref={dropdownRef} className="relative">
                     <div
                       ref={triggerRef}
@@ -448,65 +496,69 @@ export default function CreateProjectPage() {
                       </div>
                       <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
+
+                    {/* Portal Dropdown */}
+                    {isDropdownOpen && typeof window !== 'undefined' && createPortal(
+                      <div
+                        ref={portalRef}
+                        className="absolute z-[99999] bg-gray-900/98 border border-white/30 rounded-xl shadow-2xl max-h-64 overflow-hidden backdrop-blur-lg border-2"
+                        style={{
+                          top: dropdownPosition.top,
+                          left: dropdownPosition.left,
+                          width: dropdownPosition.width,
+                          minWidth: '350px',
+                          maxWidth: '450px',
+                          willChange: 'transform',
+                          transform: 'translateZ(0)'
+                        }}
+                      >
+                        {/* Search Input */}
+                        <div className="p-3 border-b border-white/10">
+                          <input
+                            type="text"
+                            placeholder="Search employees..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+
+                        {/* Employee List */}
+                        <div className="max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+                          {filteredEmployees.length === 0 ? (
+                            <div className="p-4 text-center text-gray-500 text-sm">
+                              {searchTerm ? 'No employees found' : 'No employees available'}
+                            </div>
+                          ) : (
+                            filteredEmployees.map((employee) => {
+                              const isSelected = selectedEmployees.some(emp => emp._id === employee._id);
+                              return (
+                                <div
+                                  key={employee._id}
+                                  className={`px-4 py-3 cursor-pointer transition-all duration-150 flex items-center gap-3 ${isSelected ? 'bg-primary/15 border-l-2 border-primary' : 'hover:bg-white/5'
+                                    }`}
+                                  onClick={() => handleEmployeeSelect(employee)}
+                                >
+                                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected
+                                    ? 'bg-primary border-primary scale-110'
+                                    : 'border-white/20 hover:border-white/40'
+                                    }`}>
+                                    {isSelected && <Check className="w-3 h-3 text-black" />}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-medium text-white truncate">{employee.name}</p>
+                                    <p className="text-xs text-gray-500 truncate">{employee.email}</p>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>,
+                      document.body
+                    )}
                   </div>
-
-                  {/* Portal Dropdown */}
-                  {isDropdownOpen && typeof window !== 'undefined' && createPortal(
-                    <div
-                      ref={dropdownRef}
-                      className="fixed z-[9999] bg-card border border-white/10 rounded-xl shadow-lg max-h-60 overflow-hidden"
-                      style={{
-                        top: dropdownPosition.top,
-                        left: dropdownPosition.left,
-                        width: dropdownPosition.width
-                      }}
-                    >
-                      {/* Search Input */}
-                      <div className="p-3 border-b border-white/10">
-                        <input
-                          type="text"
-                          placeholder="Search employees..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </div>
-
-                      {/* Employee List */}
-                      <div className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                        {filteredEmployees.length === 0 ? (
-                          <div className="p-4 text-center text-gray-500 text-sm">
-                            {searchTerm ? 'No employees found' : 'No employees available'}
-                          </div>
-                        ) : (
-                          filteredEmployees.map((employee) => {
-                            const isSelected = selectedEmployees.some(emp => emp._id === employee._id);
-                            return (
-                              <div
-                                key={employee._id}
-                                className={`px-4 py-3 cursor-pointer transition-colors flex items-center gap-3 ${isSelected ? 'bg-primary/10' : 'hover:bg-white/5'
-                                  }`}
-                                onClick={() => handleEmployeeSelect(employee)}
-                              >
-                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${isSelected
-                                  ? 'bg-primary border-primary'
-                                  : 'border-white/20'
-                                  }`}>
-                                  {isSelected && <Check className="w-3 h-3 text-black" />}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-medium text-white truncate">{employee.name}</p>
-                                  <p className="text-xs text-gray-500 truncate">{employee.email}</p>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>,
-                    document.body
-                  )}
 
                   {/* Selected Employees Display */}
                   {selectedEmployees.length > 0 && (
