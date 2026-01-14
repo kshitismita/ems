@@ -7,10 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongo:27017/ems
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+    env_file:
+      - .env.local
     depends_on:
       - mongo
     networks:
